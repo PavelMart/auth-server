@@ -18,6 +18,8 @@ const UserDto_1 = __importDefault(require("../dtos/UserDto"));
 const token_service_1 = __importDefault(require("./token.service"));
 const ApiError_1 = __importDefault(require("../error/ApiError"));
 const token_model_1 = require("../models/token.model");
+const box_service_1 = __importDefault(require("./box.service"));
+const box_model_1 = require("../models/box.model");
 class UserService {
     registration(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,6 +30,7 @@ class UserService {
                 }
                 const hashPassword = yield bcryptjs_1.default.hash(password, 5);
                 const user = yield user_model_1.User.create({ email, password: hashPassword });
+                const boxes = yield box_service_1.default.createBoxes(user.id, user.email, 3);
                 const responseData = this.createResponseData(user);
                 return responseData;
             }
@@ -91,7 +94,7 @@ class UserService {
     getUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const users = yield user_model_1.User.findAll({ include: { model: token_model_1.Token } });
+                const users = yield user_model_1.User.findAll({ include: [{ model: token_model_1.Token }, { model: box_model_1.Box }] });
                 return users;
             }
             catch (e) {

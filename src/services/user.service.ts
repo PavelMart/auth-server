@@ -1,10 +1,13 @@
-import { UserFromServiceType } from "../controllers/user.controller";
-import { User, UserModel } from "../models/user.model";
+import { User } from "../models/user.model";
 import bcrypt from "bcryptjs";
 import UserDto from "../dtos/UserDto";
 import tokenService from "./token.service";
 import ApiError from "../error/ApiError";
 import { Token } from "../models/token.model";
+import boxService from "./box.service";
+import { Box } from "../models/box.model";
+import BoxDto from "../dtos/BoxDto";
+import { UserFromServiceType, UserModel } from "../types/types";
 
 class UserService {
     async registration(email: string, password: string): Promise<UserFromServiceType> {
@@ -15,6 +18,7 @@ class UserService {
             }
             const hashPassword = await bcrypt.hash(password, 5);
             const user = await User.create({ email, password: hashPassword });
+            const boxes = await boxService.createBoxes(user.id, user.email, 3);
 
             const responseData = this.createResponseData(user);
             return responseData;
@@ -72,7 +76,7 @@ class UserService {
 
     async getUsers() {
         try {
-            const users = await User.findAll({ include: { model: Token } });
+            const users = await User.findAll({ include: [{ model: Token }, { model: Box }] });
             return users;
         } catch (e: any) {
             throw new Error(`Service error (getUsers): ${e.message}`);
@@ -81,10 +85,11 @@ class UserService {
 
     async createResponseData(user: UserModel) {
         const userDto = new UserDto(user.id, user.email);
+
         const tokens = tokenService.generateTokens({ ...userDto });
         await tokenService.saveRefreshToken(userDto.id, tokens.refreshToken);
+
         return { ...userDto, ...tokens };
     }
 }
-
 export default new UserService();

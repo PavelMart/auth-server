@@ -1,11 +1,6 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import { DataTypes } from "sequelize";
 import sequelize from "../db";
-
-export interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
-    id: CreationOptional<string>;
-    email: string;
-    password: string;
-}
+import { UserModel } from "../types/types";
 
 export const User = sequelize.define<UserModel>("user", {
     id: { type: DataTypes.UUID, primaryKey: true, unique: true, defaultValue: DataTypes.UUIDV4 },

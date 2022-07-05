@@ -1,29 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../error/ApiError";
 import userService from "../services/user.service";
-
-type RequestBody = {
-    email: string;
-    password: string;
-};
-
-interface CustomRequest<T> extends Request {
-    body: T;
-    user?: {
-        id: string;
-        email: string;
-    } | null;
-}
-
-export type UserFromServiceType = {
-    id: string;
-    email: string;
-    accessToken: string;
-    refreshToken: string;
-};
+import { CustomRequestWithUser, UserBodyForLogReg, UserFromServiceType } from "../types/types";
 
 class UserController {
-    async registration(req: CustomRequest<RequestBody>, res: Response, next: NextFunction) {
+    async registration(req: CustomRequestWithUser<UserBodyForLogReg>, res: Response, next: NextFunction) {
         try {
             const { email, password } = req.body;
             const user: UserFromServiceType = await userService.registration(email, password);
@@ -34,7 +15,7 @@ class UserController {
         }
     }
 
-    async login(req: CustomRequest<RequestBody>, res: Response, next: NextFunction) {
+    async login(req: CustomRequestWithUser<UserBodyForLogReg>, res: Response, next: NextFunction) {
         try {
             const { email, password } = req.body;
             const user: UserFromServiceType = await userService.login(email, password);

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { Token, TokenModel } from "../models/token.model";
+import { Token } from "../models/token.model";
+import { TokenModel } from "../types/types";
 
 type ValidateData = {
     id: string;

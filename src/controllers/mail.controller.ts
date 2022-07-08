@@ -1,4 +1,6 @@
 import { NextFunction, Response, Request } from "express";
+import ApiError from "../error/ApiError";
+import boxService from "../services/box.service";
 import mailService from "../services/mail.service";
 
 interface QueryParamsRequest extends Request {
@@ -23,7 +25,19 @@ class MailController {
 
             return res.json(mails);
         } catch (e: any) {
-            throw new Error(e.message);
+            return next(new Error(e.message));
+        }
+    }
+    async createMail(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { body } = req;
+            const box = await boxService.getBox(body.to);
+            if (!box) return next(ApiError.BadRequest("Email не найден"));
+            const mail = await mailService.createMail(box.id, body.from, body.html, body.theme);
+
+            return res.json(mail);
+        } catch (e: any) {
+            return next(ApiError.BadRequest(e.message));
         }
     }
 }

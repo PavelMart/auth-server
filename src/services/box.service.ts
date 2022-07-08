@@ -3,6 +3,7 @@ import { v4 } from "uuid";
 import { BoxModel } from "../types/types";
 import mailService from "./mail.service";
 import BoxDto from "../dtos/BoxDto";
+import { User } from "../models/user.model";
 
 class BoxService {
     async createBox(userId: string, userName: string) {
@@ -36,6 +37,11 @@ class BoxService {
         } catch (e: any) {
             throw new Error(e.message);
         }
+    }
+
+    async getBox(email: string) {
+        const box = await Box.findOne({ where: { email } });
+        return box;
     }
 
     async getBoxes(userId: string) {

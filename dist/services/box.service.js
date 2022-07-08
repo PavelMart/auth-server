@@ -44,6 +44,12 @@ class BoxService {
             }
         });
     }
+    getBox(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const box = yield box_model_1.Box.findOne({ where: { email } });
+            return box;
+        });
+    }
     getBoxes(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const boxes = yield box_model_1.Box.findAll({ where: { userId } });

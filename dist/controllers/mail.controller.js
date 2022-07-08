@@ -12,6 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const ApiError_1 = __importDefault(require("../error/ApiError"));
+const box_service_1 = __importDefault(require("../services/box.service"));
 const mail_service_1 = __importDefault(require("../services/mail.service"));
 class MailController {
     deleteMails(req, res, next) {
@@ -27,7 +29,22 @@ class MailController {
                 return res.json(mails);
             }
             catch (e) {
-                throw new Error(e.message);
+                return next(new Error(e.message));
+            }
+        });
+    }
+    createMail(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { body } = req;
+                const box = yield box_service_1.default.getBox(body.to);
+                if (!box)
+                    return next(ApiError_1.default.BadRequest("Email не найден"));
+                const mail = yield mail_service_1.default.createMail(box.id, body.from, body.html, body.theme);
+                return res.json(mail);
+            }
+            catch (e) {
+                return next(ApiError_1.default.BadRequest(e.message));
             }
         });
     }

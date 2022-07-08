@@ -4,14 +4,12 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import router from "./routes/index";
 import models from "./models/index";
-import { cors } from "./middleware/corsMiddleware";
 import errorMiddleware from "./middleware/errorMiddleware";
 
 const app = express();
 
 const PORT = process.env.PORT || 5001;
 
-app.use(cors);
 app.use(express.json());
 app.use(cookieParser());
 
